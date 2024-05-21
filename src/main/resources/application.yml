@@ -26,3 +26,9 @@ spring:
       maximum-pool-size: 30
 management:
   address: ENC(PhaQ3ZLpQWvWcDJxFv5T8c43cYlhcrSqIo715MIi2f0=)
+mybatis:
+  type-aliases-package: com.forestfull.helper.domain
+  type-handlers-package: com.forestfull.helper.handler
+  configuration:
+    default-statement-timeout: 5
+    map-underscore-to-camel-case: true
