@@ -1,6 +1,7 @@
 package com.forestfull.helper.service;
 
 import com.forestfull.helper.domain.Client;
+import com.forestfull.helper.domain.Json;
 import com.forestfull.helper.mapper.SupportMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.annotations.Param;
@@ -16,5 +17,9 @@ public class SupportService {
 
     public List<Client.History> getHistoriesByClientToken(String token) {
         return supportMapper.getHistoriesByClientToken(token);
+    }
+
+    public void toRequestForSolution(String token, Json requestData) {
+        supportMapper.toRequestForSolution(token, requestData);
     }
 }
