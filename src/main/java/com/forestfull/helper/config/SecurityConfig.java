@@ -45,7 +45,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Component
+@Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -105,10 +105,10 @@ public class SecurityConfig {
     }
 
     @Bean
-    UserDetailsService userDetailsService() {
+    UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
         return new InMemoryUserDetailsManager(User.builder()
                 .username(username)
-                .password(passwordEncoder().encode(password))
+                .password(passwordEncoder.encode(password))
                 .roles("MANAGER")
                 .build());
     }
