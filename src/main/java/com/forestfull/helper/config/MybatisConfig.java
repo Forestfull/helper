@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 public class MybatisConfig {
 
     @Bean
-    SqlSessionFactoryBeanCustomizer sqlSessionFactoryBeanCustomizer(){
+    SqlSessionFactoryBeanCustomizer sqlSessionFactoryBeanCustomizer() {
         return bean -> bean.setVfs(SpringBootVFS.class);
     }
 }
