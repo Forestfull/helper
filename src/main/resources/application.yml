@@ -32,3 +32,5 @@ mybatis:
   configuration:
     default-statement-timeout: 5
     map-underscore-to-camel-case: true
+server:
+  port: 80
