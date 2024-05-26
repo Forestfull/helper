@@ -1,6 +1,7 @@
 package com.forestfull.helper.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.forestfull.helper.entity.Json;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

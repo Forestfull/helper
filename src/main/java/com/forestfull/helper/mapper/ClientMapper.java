@@ -1,7 +1,7 @@
 package com.forestfull.helper.mapper;
 
 import com.forestfull.helper.domain.Client;
-import com.forestfull.helper.domain.Json;
+import com.forestfull.helper.entity.Json;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -21,8 +21,8 @@ public interface ClientMapper {
     @Select("SELECT c.id, c.code, c.description FROM client c WHERE c.token = #{token}")
     Optional<Client> getClientByToken(@Param("token") String token);
 
-    @Select("SELECT c.id, c.code, c.description FROM client c")
-    List<Client> getAllClient();
+    @Select("SELECT c.id, c.code, c.description FROM client c WHERE c.is_used = TRUE")
+    List<Client> getUsedAllClient();
 
     class Provider {
 

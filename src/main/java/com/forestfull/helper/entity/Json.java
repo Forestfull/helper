@@ -1,4 +1,4 @@
-package com.forestfull.helper.domain;
+package com.forestfull.helper.entity;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;

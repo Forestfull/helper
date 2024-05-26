@@ -1,9 +1,8 @@
 package com.forestfull.helper.controller;
 
 import com.forestfull.helper.domain.Client;
-import com.forestfull.helper.domain.Json;
+import com.forestfull.helper.entity.Json;
 import com.forestfull.helper.service.ClientService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

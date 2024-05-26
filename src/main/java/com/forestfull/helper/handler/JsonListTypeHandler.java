@@ -1,7 +1,7 @@
 package com.forestfull.helper.handler;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.forestfull.helper.domain.Json;
+import com.forestfull.helper.entity.Json;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
