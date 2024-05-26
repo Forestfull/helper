@@ -79,6 +79,15 @@ public class SecurityConfig {
                     req.setAttribute("ipAddress", IpUtil.getIpAddress((HttpServletRequest) req));
                     chain.doFilter(req, res);
                 }, ChannelProcessingFilter.class)
+                .authorizeHttpRequests(reg -> {
+                    reg.requestMatchers(HttpMethod.GET, clientUriPatterns)
+                            .access((auth, ctx) -> {
+                                final String token = String.valueOf(ctx.getRequest().getParameter("token"));
+                                return null;
+
+
+                            });
+                })
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())
                 .build();
