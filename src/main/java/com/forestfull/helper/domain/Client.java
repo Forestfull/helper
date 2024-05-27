@@ -21,6 +21,7 @@ public class Client {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class History {
+        private Long id;
         private Long clientId;
         private Client client;
         private String type;

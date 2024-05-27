@@ -24,8 +24,8 @@ public class ClientService {
         return clientMapper.getClientByToken(token);
     }
 
-    public List<Client.History> getHistoriesByClientToken(String token) {
-        final List<Client.History> historiesByClientToken = clientMapper.getHistoriesByClientToken(token);
+    public List<Client.History> getHistoriesByClientToken(String token, List<Long> exceptedIds) {
+        final List<Client.History> historiesByClientToken = clientMapper.getHistoriesByClientToken(token, exceptedIds);
         if (ObjectUtils.isEmpty(historiesByClientToken)) return Collections.emptyList();
 
         return historiesByClientToken.stream()

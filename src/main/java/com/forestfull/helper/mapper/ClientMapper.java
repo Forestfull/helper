@@ -2,20 +2,19 @@ package com.forestfull.helper.mapper;
 
 import com.forestfull.helper.domain.Client;
 import com.forestfull.helper.entity.Json;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.jdbc.SQL;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Mapper
 public interface ClientMapper {
 
-    @Select("SELECT ch.client_id, ch.type, ch.ip_address, ch.data, ch.created_time FROM client_history ch JOIN client c ON ch.client_id = c.id AND c.token = #{token}")
-    List<Client.History> getHistoriesByClientToken(@Param("token") String token);
+    @SelectProvider(type = Provider.class, method = "getHistoriesByClientToken")
+    List<Client.History> getHistoriesByClientToken(@Param("token") String token, @Param("exceptedIds") List<Long> exceptedIds);
 
     @Insert("INSERT INTO client_history(client_id, ip_address, data) VALUES (#{clientId}, #{ipAddress}, #{requestData})")
     void toRequestForSolution(@Param("clientId") Long clientId, @Param("ipAddress") String ipAddress, @Param("requestData") Json requestData);
@@ -27,6 +26,15 @@ public interface ClientMapper {
     List<Client> getUsedAllClient();
 
     class Provider {
+        public String getHistoriesByClientToken(@Param("token") String token, @Param("exceptedIds") List<Long> exceptedIds) {
+            return new SQL() {{
+                SELECT("ch.id, ch.client_id, ch.type, ch.ip_address, ch.data, ch.created_time");
+                FROM("client_history ch");
+                JOIN("client c ON ch.client_id = c.id AND c.token = #{token}");
+                if (!ObjectUtils.isEmpty(exceptedIds))
+                    WHERE("ch.id NOT IN (" + exceptedIds.stream().map(String::valueOf).collect(Collectors.joining(", ")) + ")");
 
+            }}.toString();
+        }
     }
 }

@@ -23,8 +23,10 @@ public class ClientController {
     }
 
     @GetMapping(URI.SUPPORT_HISTORY)
-    NetworkVO.Response<List<Client.History>> getHistoriesByClientToken(String token) {
-        return NetworkVO.Response.ok(NetworkVO.DATA_TYPE.JSON, clientService.getHistoriesByClientToken(token));
+    NetworkVO.Response<List<Client.History>> getHistoriesByClientToken(
+            @RequestParam(name = "token") String token
+            , @RequestParam(name = "exceptedIds", required = false) List<Long> exceptedIds) {
+        return NetworkVO.Response.ok(NetworkVO.DATA_TYPE.JSON, clientService.getHistoriesByClientToken(token, exceptedIds));
     }
 
     @PostMapping(URI.SUPPORT)
