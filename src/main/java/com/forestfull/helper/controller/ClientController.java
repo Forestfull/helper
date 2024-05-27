@@ -20,7 +20,7 @@ public class ClientController {
     }
 
     @GetMapping(URI.SUPPORT_HISTORY)
-    List<Client.History> getHistoriesByClientToken(@RequestAttribute("ipAddress") String ipAddress, String token){
+    List<Client.History> getHistoriesByClientToken(String token){
 
         return clientService.getHistoriesByClientToken(token);
     }

@@ -30,7 +30,6 @@ public class IpUtil {
 
             return request.getHeader(headerName);
         }
-        return null;
+        return request.getRemoteAddr();
     }
-
 }

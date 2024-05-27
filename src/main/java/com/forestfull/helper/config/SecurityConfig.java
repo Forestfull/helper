@@ -2,22 +2,12 @@ package com.forestfull.helper.config;
 
 import com.forestfull.helper.controller.ClientController;
 import com.forestfull.helper.domain.Client;
-import com.forestfull.helper.service.ClientService;
-import com.forestfull.helper.util.IpUtil;
-import com.forestfull.helper.util.ScheduleManager;
-import jakarta.servlet.*;
-import jakarta.servlet.http.HttpServletRequest;
+import com.forestfull.helper.service.CommmonFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.filters.RemoteIpFilter;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.filter.OrderedFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -25,24 +15,24 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.header.writers.StaticHeadersWriter;
-import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.support.MultipartFilter;
+import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
+import org.springframework.security.web.header.HeaderWriterFilter;
+import org.springframework.security.web.session.DisableEncodeUrlFilter;
+import org.springframework.util.AntPathMatcher;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Configuration
@@ -56,11 +46,14 @@ public class SecurityConfig {
     @Value("${spring.datasource.password}")
     String password;
 
-    private final ClientService clientService;
+    public static final String[] ignoringPattern = {"/favicon.ico", "/resources/**"};
+    public static final AntPathMatcher antPathMatcher = new AntPathMatcher();
+
+    private final CommmonFilter commmonFilter;
 
     @Bean
     WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("favicon.ico", "/resources/**");
+        return (web) -> web.ignoring().requestMatchers(ignoringPattern);
     }
 
     @Bean
@@ -81,21 +74,17 @@ public class SecurityConfig {
 
 
         return http
-                .addFilterBefore((req, res, chain) -> {
-                    req.setAttribute("ipAddress", IpUtil.getIpAddress((HttpServletRequest) req));
-                    chain.doFilter(req, res);
-                }, ChannelProcessingFilter.class)
                 .authorizeHttpRequests(reg -> {
-                    reg.requestMatchers(HttpMethod.GET, clientUriPatterns)
+                    reg.requestMatchers(clientUriPatterns)
                             .access((auth, ctx) -> {
-                                final String token = String.valueOf(ctx.getRequest().getParameter("token"));
-                                final Optional<Client> clientByToken = clientService.getClientByToken(token);
-
-                                return new AuthorizationDecision(clientByToken.isPresent());
+                                final Optional<String> client = Optional.ofNullable(ctx.getRequest().getHeader("client"));
+                                return new AuthorizationDecision(client.isPresent());
                             });
                 })
-                .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())
+                .formLogin(AbstractHttpConfigurer::disable)
+                .cors(AbstractHttpConfigurer::disable)
+                .addFilterAfter(commmonFilter, HeaderWriterFilter.class)
                 .build();
     }
 
