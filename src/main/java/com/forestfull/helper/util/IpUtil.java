@@ -2,9 +2,12 @@ package com.forestfull.helper.util;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.Objects;
 
 public class IpUtil {
 
@@ -31,5 +34,10 @@ public class IpUtil {
             return request.getHeader(headerName);
         }
         return request.getRemoteAddr();
+    }
+
+    public static String getIpAddress() {
+        HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
+        return getIpAddress(request);
     }
 }
