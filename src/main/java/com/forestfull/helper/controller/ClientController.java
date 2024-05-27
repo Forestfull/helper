@@ -1,6 +1,7 @@
 package com.forestfull.helper.controller;
 
 import com.forestfull.helper.domain.Client;
+import com.forestfull.helper.entity.Json;
 import com.forestfull.helper.entity.NetworkVO;
 import com.forestfull.helper.handler.JsonTypeHandler;
 import com.forestfull.helper.service.ClientService;
@@ -28,7 +29,7 @@ public class ClientController {
 
     @PostMapping(URI.SUPPORT)
     NetworkVO.Response<String> toRequestForSolution(
-            @RequestBody String requestData
+            @RequestBody Json requestData
             , @RequestHeader String client
             , @RequestHeader String ipAddress
     ) throws IOException {

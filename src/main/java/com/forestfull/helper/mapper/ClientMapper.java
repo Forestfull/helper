@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.jdbc.SQL;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +18,7 @@ public interface ClientMapper {
     List<Client.History> getHistoriesByClientToken(@Param("token") String token);
 
     @Insert("INSERT INTO client_history(client_id, ip_address, data) VALUES (#{clientId}, #{ipAddress}, #{requestData})")
-    void toRequestForSolution(@Param("clientId") Long clientId, @Param("ipAddress") String ipAddress, @Param("requestData") String requestData);
+    void toRequestForSolution(@Param("clientId") Long clientId, @Param("ipAddress") String ipAddress, @Param("requestData") Json requestData);
 
     @Select("SELECT c.id, c.code, c.description FROM client c WHERE c.token = #{token}")
     Optional<Client> getClientByToken(@Param("token") String token);
