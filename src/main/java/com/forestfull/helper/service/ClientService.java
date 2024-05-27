@@ -3,13 +3,16 @@ package com.forestfull.helper.service;
 import com.forestfull.helper.domain.Client;
 import com.forestfull.helper.entity.Json;
 import com.forestfull.helper.mapper.ClientMapper;
+import com.forestfull.helper.util.IpUtil;
 import com.forestfull.helper.util.ScheduleManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +37,7 @@ public class ClientService {
                 .toList();
     }
 
-    public void toRequestForSolution(Long clientId, String ipAddress, Json requestData) {
-        clientMapper.toRequestForSolution(clientId, ipAddress, requestData);
+    public void toRequestForSolution(Long clientId, Json requestData) {
+        clientMapper.toRequestForSolution(clientId, IpUtil.getIpAddress(), requestData);
     }
 }

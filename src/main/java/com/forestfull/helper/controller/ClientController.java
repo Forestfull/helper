@@ -33,9 +33,8 @@ public class ClientController {
     NetworkVO.Response<String> toRequestForSolution(
             @RequestBody Json requestData
             , @RequestHeader String client
-            , @RequestHeader String ipAddress
     ) throws IOException {
-        clientService.toRequestForSolution(JsonTypeHandler.reader.readValue(client, Client.class).getId(), ipAddress, requestData);
+        clientService.toRequestForSolution(JsonTypeHandler.reader.readValue(client, Client.class).getId(), requestData);
         return NetworkVO.Response.ok(NetworkVO.DATA_TYPE.STRING, "Success");
     }
 }

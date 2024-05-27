@@ -36,47 +36,45 @@ import java.util.Optional;
 public class SecurityConfig {
 
     @Value("${spring.datasource.username}")
-    String username;
+    private String username;
 
     @Value("${spring.datasource.password}")
-    String password;
-
-    public static final String[] ignoringPattern = {"/favicon.**", "/resources/**"};
-    public static final AntPathMatcher antPathMatcher = new AntPathMatcher();
+    private String password;
 
     private final CommmonFilter commmonFilter;
 
+    public static final String[] ignoringPattern = {"/favicon.**", "/resources/**"};
+    public static final String[] clientUriPatterns = Arrays.stream(ClientController.URI.class.getFields())
+            .map(field -> {
+                try {
+                    return field.get(ClientController.URI.class.getFields());
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace(System.out);
+                    log.error(e.getMessage());
+                    return null;
+                }
+            })
+            .filter(Objects::nonNull)
+            .map(uri -> uri + "/**")
+            .toArray(String[]::new);
+    public static final String[] managementUriPatterns = Arrays.stream(ManagementController.URI.class.getFields())
+            .map(field -> {
+                try {
+                    return field.get(ManagementController.URI.class.getFields());
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace(System.out);
+                    log.error(e.getMessage());
+                    return null;
+                }
+            })
+            .filter(Objects::nonNull)
+            .map(uri -> uri + "/**")
+            .toArray(String[]::new);
+
+    public static final AntPathMatcher antPathMatcher = new AntPathMatcher();
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        final String[] clientUriPatterns = Arrays.stream(ClientController.URI.class.getFields())
-                .map(field -> {
-                    try {
-                        return field.get(ClientController.URI.class.getFields());
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace(System.out);
-                        log.error(e.getMessage());
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .map(uri -> uri + "/**")
-                .toArray(String[]::new);
-
-        final String[] managementUriPatterns = Arrays.stream(ManagementController.URI.class.getFields())
-                .map(field -> {
-                    try {
-                        return field.get(ManagementController.URI.class.getFields());
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace(System.out);
-                        log.error(e.getMessage());
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .map(uri -> uri + "/**")
-                .toArray(String[]::new);
-
-
         return http
                 .authorizeHttpRequests(reg -> reg.requestMatchers(HttpMethod.GET, ignoringPattern).permitAll())
                 .authorizeHttpRequests(reg -> reg.requestMatchers(clientUriPatterns)
@@ -84,13 +82,9 @@ public class SecurityConfig {
                             final Optional<String> client = Optional.ofNullable(ctx.getRequest().getHeader("client"));
                             return new AuthorizationDecision(client.isPresent());
                         }))
-                .authorizeHttpRequests(reg -> reg.requestMatchers(managementUriPatterns)
-                        .access((auth, ctx) -> {
-                            final Authentication authentication = auth.get();
-                            return new AuthorizationDecision(authentication.isAuthenticated());
-                        }))
+                .authorizeHttpRequests(reg -> reg.requestMatchers(managementUriPatterns).authenticated())
                 .httpBasic(Customizer.withDefaults())
-                .formLogin(AbstractHttpConfigurer::disable)
+                .formLogin(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .addFilterAfter(commmonFilter, HeaderWriterFilter.class)
                 .build();

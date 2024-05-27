@@ -5,6 +5,7 @@ import com.forestfull.helper.entity.Json;
 import com.forestfull.helper.entity.NetworkVO;
 import com.forestfull.helper.handler.JsonTypeHandler;
 import com.forestfull.helper.service.ManagementService;
+import com.forestfull.helper.util.IpUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,16 +21,15 @@ public class ManagementController {
     private final ManagementService managementService;
 
     public static class URI {
-        public static final String SOLUTION = "/solution";
+        public static final String MANAGEMENT = "/management";
     }
 
-    @PostMapping(URI.SOLUTION)
+    @PostMapping(URI.MANAGEMENT)
     NetworkVO.Response<String> toResponseForSolution(
             @RequestBody Json requestData
-            , @RequestHeader String client
-            , @RequestHeader String ipAddress
+            , @RequestHeader String serviceCode
     ) throws IOException {
-        managementService.toRequestForSolution(JsonTypeHandler.reader.readValue(client, Client.class).getId(), ipAddress, requestData);
+        managementService.toRequestForSolution(JsonTypeHandler.reader.readValue(serviceCode, Client.class).getId(), requestData);
         return NetworkVO.Response.ok(NetworkVO.DATA_TYPE.STRING, "Success");
     }
 }

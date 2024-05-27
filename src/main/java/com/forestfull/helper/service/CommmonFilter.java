@@ -32,51 +32,63 @@ public class CommmonFilter implements Filter {
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) {
         try {
             final HttpServletRequest request = (HttpServletRequest) req;
-            if (Arrays.stream(SecurityConfig.ignoringPattern).anyMatch(uri -> SecurityConfig.antPathMatcher.match(uri, request.getRequestURI()))) {
+            final String requestURI = request.getRequestURI();
+            if (Arrays.stream(SecurityConfig.ignoringPattern)
+                    .anyMatch(uri -> SecurityConfig.antPathMatcher.match(uri, requestURI))) {
                 chain.doFilter(req, res);
-                return;
-            }
 
-            final RemoteIpFilter.XForwardedRequest forwardedRequest = new RemoteIpFilter.XForwardedRequest(request);
-            final String token = HttpMethod.GET.name().equalsIgnoreCase(request.getMethod())
-                    ? String.valueOf(request.getParameter("token"))
-                    : request.getHeader("token");
-            final Optional<Client> clientByToken = clientService.getClientByToken(token);
+            } else if (Arrays.stream(SecurityConfig.clientUriPatterns)
+                    .anyMatch(uri -> SecurityConfig.antPathMatcher.match(uri, requestURI))) {
+                final RemoteIpFilter.XForwardedRequest forwardedRequest = new RemoteIpFilter.XForwardedRequest(request);
+                final String token = HttpMethod.GET.name().equalsIgnoreCase(request.getMethod())
+                        ? String.valueOf(request.getParameter("token"))
+                        : request.getHeader("token");
+                final Optional<Client> clientByToken = clientService.getClientByToken(token);
 
-            if (clientByToken.isPresent()) {
-                final String ipAddress = IpUtil.getIpAddress(forwardedRequest);
-                if (!StringUtils.hasText(ipAddress)) {
+                if (clientByToken.isPresent()) {
+                    if (!StringUtils.hasText(IpUtil.getIpAddress())) {
+                        chain.doFilter(req, res);
+                        return;
+                    }
+
+                    forwardedRequest.setHeader("client", JsonTypeHandler.writer.writeValueAsString(clientByToken.get()));
+
+                    final Map<String, List<String>> header = new LinkedHashMap<>();
+                    final Iterator<String> headerNames = forwardedRequest.getHeaderNames().asIterator();
+                    while (headerNames.hasNext()) {
+                        final List<String> values = new LinkedList<>();
+
+                        final String headerName = headerNames.next();
+                        final Iterator<String> headerContents = forwardedRequest.getHeaders(headerName).asIterator();
+                        headerContents.forEachRemaining(values::add);
+                        header.put(headerName, values);
+                    }
+
+                    final Map<String, String> attributes = new LinkedHashMap<>();
+                    final Iterator<String> attributeNames = forwardedRequest.getAttributeNames().asIterator();
+                    while (attributeNames.hasNext()) {
+                        final String attributeName = attributeNames.next();
+                        attributes.put(attributeName, String.valueOf(forwardedRequest.getAttribute(attributeName)));
+                    }
+
+                    final String requestHeader = JsonTypeHandler.writer.writeValueAsString(header);
+                    final String requestAttributes = JsonTypeHandler.writer.writeValueAsString(attributes);
+
+                    commonMapper.recordRequestHistory(requestURI, requestHeader, requestAttributes, new RequestWrapper(forwardedRequest).getBody()); //request body 일회성 방지용
+                }
+                chain.doFilter(forwardedRequest, res);
+
+            } else if (Arrays.stream(SecurityConfig.managementUriPatterns)
+                    .anyMatch(uri -> SecurityConfig.antPathMatcher.match(uri, requestURI))) {
+                final RemoteIpFilter.XForwardedRequest forwardedRequest = new RemoteIpFilter.XForwardedRequest(request);
+
+                if (!StringUtils.hasText(IpUtil.getIpAddress())) {
                     chain.doFilter(req, res);
                     return;
                 }
 
-                forwardedRequest.setHeader("ipAddress", ipAddress);
-                forwardedRequest.setHeader("client", JsonTypeHandler.writer.writeValueAsString(clientByToken.get()));
-
-                final Map<String, List<String>> header = new LinkedHashMap<>();
-                final Iterator<String> headerNames = forwardedRequest.getHeaderNames().asIterator();
-                while (headerNames.hasNext()) {
-                    final List<String> values = new LinkedList<>();
-
-                    final String headerName = headerNames.next();
-                    final Iterator<String> headerContents = forwardedRequest.getHeaders(headerName).asIterator();
-                    headerContents.forEachRemaining(values::add);
-                    header.put(headerName, values);
-                }
-
-                final Map<String, String> attributes = new LinkedHashMap<>();
-                final Iterator<String> attributeNames = forwardedRequest.getAttributeNames().asIterator();
-                while (attributeNames.hasNext()) {
-                    final String attributeName = attributeNames.next();
-                    attributes.put(attributeName, String.valueOf(forwardedRequest.getAttribute(attributeName)));
-                }
-
-                final String requestHeader = JsonTypeHandler.writer.writeValueAsString(header);
-                final String requestAttributes = JsonTypeHandler.writer.writeValueAsString(attributes);
-
-                commonMapper.recordRequestHistory(request.getRequestURI(), requestHeader, requestAttributes, new RequestWrapper(forwardedRequest).getBody()); //request body 일회성 방지용
+                chain.doFilter(forwardedRequest, res);
             }
-            chain.doFilter(forwardedRequest, res);
         } catch (IOException | ServletException e) {
             e.printStackTrace(System.out);
             throw new RuntimeException();
