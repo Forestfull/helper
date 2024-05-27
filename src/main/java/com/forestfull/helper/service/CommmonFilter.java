@@ -88,6 +88,9 @@ public class CommmonFilter implements Filter {
                 }
 
                 chain.doFilter(forwardedRequest, res);
+
+            } else {
+                chain.doFilter(req, res);
             }
         } catch (IOException | ServletException e) {
             e.printStackTrace(System.out);
