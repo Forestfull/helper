@@ -1,7 +1,6 @@
 package com.forestfull.helper.config;
 
 import com.forestfull.helper.controller.ClientController;
-import com.forestfull.helper.domain.Client;
 import com.forestfull.helper.service.CommmonFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,14 +19,7 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.channel.ChannelProcessingFilter;
-import org.springframework.security.web.access.intercept.AuthorizationFilter;
-import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
-import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.header.HeaderWriterFilter;
-import org.springframework.security.web.session.DisableEncodeUrlFilter;
 import org.springframework.util.AntPathMatcher;
 
 import java.util.Arrays;
@@ -74,16 +66,14 @@ public class SecurityConfig {
 
 
         return http
-                .authorizeHttpRequests(reg -> {
-                    reg.requestMatchers(clientUriPatterns)
-                            .access((auth, ctx) -> {
-                                final Optional<String> client = Optional.ofNullable(ctx.getRequest().getHeader("client"));
-                                return new AuthorizationDecision(client.isPresent());
-                            });
-                })
+                .authorizeHttpRequests(reg -> reg.requestMatchers(clientUriPatterns)
+                        .access((auth, ctx) -> {
+                            final Optional<String> client = Optional.ofNullable(ctx.getRequest().getHeader("client"));
+                            return new AuthorizationDecision(client.isPresent());
+                        }))
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
                 .addFilterAfter(commmonFilter, HeaderWriterFilter.class)
                 .build();
     }

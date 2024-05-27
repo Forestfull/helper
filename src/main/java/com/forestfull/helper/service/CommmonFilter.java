@@ -8,15 +8,17 @@ import com.forestfull.helper.util.IpUtil;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.filters.RemoteIpFilter;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.io.InputStreamReader;
 import java.util.*;
 
 @Component
@@ -69,17 +71,66 @@ public class CommmonFilter implements Filter {
                     attributes.put(attributeName, String.valueOf(forwardedRequest.getAttribute(attributeName)));
                 }
 
-                ServletInputStream inputStream = request.getInputStream();
                 final String requestHeader = JsonTypeHandler.writer.writeValueAsString(header);
                 final String requestAttributes = JsonTypeHandler.writer.writeValueAsString(attributes);
-                final String requestBody = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
 
-                commonMapper.recordRequestHistory(request.getRequestURI(), requestHeader, requestAttributes, requestBody);
+                commonMapper.recordRequestHistory(request.getRequestURI(), requestHeader, requestAttributes, new RequestWrapper(forwardedRequest).getBody()); //request body 일회성 방지용
             }
             chain.doFilter(forwardedRequest, res);
         } catch (IOException | ServletException e) {
             e.printStackTrace(System.out);
             throw new RuntimeException();
+        }
+    }
+
+    @Getter
+    static class RequestWrapper extends HttpServletRequestWrapper {
+
+        private final String body;
+
+        public RequestWrapper(HttpServletRequest request) {
+            super(request);
+
+            final StringBuilder stringBuilder = new StringBuilder();
+            try (BufferedReader bufferedReader = getCustomReader()) {
+                char[] charBuffer = new char[128];
+                int bytesRead;
+                while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
+                    stringBuilder.append(charBuffer, 0, bytesRead);
+                }
+            } catch (Exception ignore) {
+            } finally {
+                body = stringBuilder.toString();
+            }
+        }
+
+        @Override
+        public ServletInputStream getInputStream() {
+            final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(body.getBytes());
+            return new ServletInputStream() {
+                @Override
+                public boolean isFinished() {
+                    return false;
+                }
+
+                @Override
+                public boolean isReady() {
+                    return false;
+                }
+
+                @Override
+                public void setReadListener(ReadListener readListener) {
+                    throw new UnsupportedOperationException();
+                }
+
+                public int read() {
+                    return byteArrayInputStream.read();
+                }
+            };
+        }
+
+        public BufferedReader getCustomReader() {
+            return new BufferedReader(new InputStreamReader(this.getInputStream()));
         }
     }
 }
