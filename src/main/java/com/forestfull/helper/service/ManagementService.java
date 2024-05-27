@@ -17,11 +17,9 @@ public class ManagementService {
     private final ManagementMapper managementMapper;
 
     public void toRequestForSolution(String solutionCode, Json requestData) {
-        final Optional<Client> optionalClient = ScheduleManager.tokenMap.values().stream()
+        ScheduleManager.tokenMap.values().stream()
                 .filter(c -> c.getCode().equalsIgnoreCase(solutionCode))
-                .findFirst();
-
-        optionalClient
+                .findFirst()
                 .ifPresent(client -> managementMapper.toRequestForSolution(client.getId(), IpUtil.getIpAddress(), requestData));
     }
 }
