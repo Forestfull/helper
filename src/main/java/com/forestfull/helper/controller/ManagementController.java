@@ -7,6 +7,8 @@ import com.forestfull.helper.handler.JsonTypeHandler;
 import com.forestfull.helper.service.ManagementService;
 import com.forestfull.helper.util.IpUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -23,8 +25,12 @@ public class ManagementController {
     }
 
     @GetMapping(URI.MANAGEMENT + "/{serviceCode}")
-    NetworkVO.Response<List<Client.History>> getManagementHistory(@PathVariable("serviceCode") String serviceCode){
-        return NetworkVO.Response.ok(NetworkVO.DATA_TYPE.JSON, managementService.getManagementHistory(serviceCode));
+    NetworkVO.Response<List<Client.History>> getManagementHistory(@PathVariable("serviceCode") String serviceCode) {
+        final List<Client.History> managementHistory = managementService.getManagementHistory(serviceCode);
+
+        return ObjectUtils.isEmpty(managementHistory)
+                ? NetworkVO.Response.fail(HttpStatus.NOT_FOUND)
+                : NetworkVO.Response.ok(NetworkVO.DATA_TYPE.JSON, managementHistory);
     }
 
     @PostMapping(URI.MANAGEMENT + "/{serviceCode}")
