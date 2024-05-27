@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -38,15 +39,10 @@ public class SecurityConfig {
     @Value("${spring.datasource.password}")
     String password;
 
-    public static final String[] ignoringPattern = {"/favicon.ico", "/resources/**"};
+    public static final String[] ignoringPattern = {"/favicon.**", "/resources/**"};
     public static final AntPathMatcher antPathMatcher = new AntPathMatcher();
 
     private final CommmonFilter commmonFilter;
-
-    @Bean
-    WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers(ignoringPattern);
-    }
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -71,6 +67,7 @@ public class SecurityConfig {
                             final Optional<String> client = Optional.ofNullable(ctx.getRequest().getHeader("client"));
                             return new AuthorizationDecision(client.isPresent());
                         }))
+                .authorizeHttpRequests(reg -> reg.requestMatchers(HttpMethod.GET, ignoringPattern).permitAll())
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
