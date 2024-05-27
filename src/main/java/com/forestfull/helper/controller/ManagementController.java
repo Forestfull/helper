@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,6 +20,11 @@ public class ManagementController {
 
     public static class URI {
         public static final String MANAGEMENT = "/management";
+    }
+
+    @GetMapping(URI.MANAGEMENT + "/{serviceCode}")
+    NetworkVO.Response<List<Client.History>> getManagementHistory(@PathVariable("serviceCode") String serviceCode){
+        return NetworkVO.Response.ok(NetworkVO.DATA_TYPE.JSON, managementService.getManagementHistory(serviceCode));
     }
 
     @PostMapping(URI.MANAGEMENT + "/{serviceCode}")

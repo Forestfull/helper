@@ -22,7 +22,7 @@ public interface ClientMapper {
     @Select("SELECT c.id, c.code, c.description FROM client c WHERE c.token = #{token}")
     Optional<Client> getClientByToken(@Param("token") String token);
 
-    @Select("SELECT c.id, c.code, c.description FROM client c WHERE c.is_used = TRUE")
+    @Select("SELECT c.id, c.token, c.code, c.description FROM client c WHERE c.is_used = TRUE")
     List<Client> getUsedAllClient();
 
     class Provider {
