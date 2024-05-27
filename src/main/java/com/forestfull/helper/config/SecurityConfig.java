@@ -1,6 +1,7 @@
 package com.forestfull.helper.config;
 
 import com.forestfull.helper.controller.ClientController;
+import com.forestfull.helper.controller.ManagementController;
 import com.forestfull.helper.service.CommmonFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -60,14 +62,33 @@ public class SecurityConfig {
                 .map(uri -> uri + "/**")
                 .toArray(String[]::new);
 
+        final String[] managementUriPatterns = Arrays.stream(ManagementController.URI.class.getFields())
+                .map(field -> {
+                    try {
+                        return field.get(ManagementController.URI.class.getFields());
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace(System.out);
+                        log.error(e.getMessage());
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .map(uri -> uri + "/**")
+                .toArray(String[]::new);
+
 
         return http
+                .authorizeHttpRequests(reg -> reg.requestMatchers(HttpMethod.GET, ignoringPattern).permitAll())
                 .authorizeHttpRequests(reg -> reg.requestMatchers(clientUriPatterns)
                         .access((auth, ctx) -> {
                             final Optional<String> client = Optional.ofNullable(ctx.getRequest().getHeader("client"));
                             return new AuthorizationDecision(client.isPresent());
                         }))
-                .authorizeHttpRequests(reg -> reg.requestMatchers(HttpMethod.GET, ignoringPattern).permitAll())
+                .authorizeHttpRequests(reg -> reg.requestMatchers(managementUriPatterns)
+                        .access((auth, ctx) -> {
+                            final Authentication authentication = auth.get();
+                            return new AuthorizationDecision(authentication.isAuthenticated());
+                        }))
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)

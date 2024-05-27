@@ -33,7 +33,6 @@ public interface ClientMapper {
                 JOIN("client c ON ch.client_id = c.id AND c.token = #{token}");
                 if (!ObjectUtils.isEmpty(exceptedIds))
                     WHERE("ch.id NOT IN (" + exceptedIds.stream().map(String::valueOf).collect(Collectors.joining(", ")) + ")");
-
             }}.toString();
         }
     }
