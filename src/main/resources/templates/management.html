@@ -10,6 +10,9 @@
         <button type="submit">Log Out</button>
     </form>
 </header>
+    <article th:each="serviceCode : ${serviceCodes}">
+        <section th:text="${serviceCode}"></section>
+    </article>
     management
 </body>
 </html>

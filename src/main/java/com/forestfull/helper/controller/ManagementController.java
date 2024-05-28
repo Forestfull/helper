@@ -4,9 +4,11 @@ import com.forestfull.helper.domain.Client;
 import com.forestfull.helper.entity.Json;
 import com.forestfull.helper.entity.NetworkVO;
 import com.forestfull.helper.service.ManagementService;
+import com.forestfull.helper.util.ScheduleManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +25,12 @@ public class ManagementController {
     }
 
     @GetMapping(URI.MANAGEMENT)
-    String forwardManagementPage() {
+    String forwardManagementPage(Model model) {
+        model.addAttribute("serviceCodes"
+                , ScheduleManager.tokenMap.values().stream()
+                        .map(Client::getCode)
+                        .toList());
+
         return "management";
     }
 
