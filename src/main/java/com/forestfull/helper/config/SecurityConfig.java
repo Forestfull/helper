@@ -42,7 +42,7 @@ public class SecurityConfig {
 
     private final CommmonFilter commmonFilter;
 
-    public static final String[] ignoringPattern = {"/favicon.**", "/resources/**"};
+    public static final String[] ignoringPattern = {"/favicon.**", "/webjars/**", "/util/**"};
     public static final String[] clientUriPatterns = Arrays.stream(ClientController.URI.class.getFields())
             .map(field -> {
                 try {
