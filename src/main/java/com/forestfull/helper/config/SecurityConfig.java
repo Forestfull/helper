@@ -13,16 +13,15 @@ import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.header.HeaderWriterFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.util.AntPathMatcher;
 
 import java.util.Arrays;
@@ -82,11 +81,19 @@ public class SecurityConfig {
                             final Optional<String> client = Optional.ofNullable(ctx.getRequest().getHeader("client"));
                             return new AuthorizationDecision(client.isPresent());
                         }))
-                .authorizeHttpRequests(reg -> reg.requestMatchers(managementUriPatterns).authenticated())
+                .authorizeHttpRequests(reg -> reg.requestMatchers(managementUriPatterns).hasRole("MANAGER"))
                 .httpBasic(Customizer.withDefaults())
-                .formLogin(Customizer.withDefaults())
+                .formLogin(config -> config.successHandler((req, res, auth) -> {
+                    if (auth.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+                            .noneMatch("ROLE_MANAGER"::equalsIgnoreCase)) {
+                        res.sendRedirect("/login");
+                        return;
+                    }
+                    res.sendRedirect("/management");
+                }))
                 .csrf(AbstractHttpConfigurer::disable)
-                .addFilterAfter(commmonFilter, HeaderWriterFilter.class)
+                .logout(config -> config.logoutSuccessUrl("/login?logout=true").invalidateHttpSession(true))
+                .addFilterAfter(commmonFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
@@ -100,7 +107,7 @@ public class SecurityConfig {
         return new InMemoryUserDetailsManager(User.builder()
                 .username(username)
                 .password(passwordEncoder.encode(password))
-                .roles("ADMIN")
+                .roles("MANAGER")
                 .build());
     }
 }

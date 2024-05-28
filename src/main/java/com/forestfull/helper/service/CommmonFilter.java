@@ -80,14 +80,7 @@ public class CommmonFilter implements Filter {
 
             } else if (Arrays.stream(SecurityConfig.managementUriPatterns)
                     .anyMatch(uri -> SecurityConfig.antPathMatcher.match(uri, requestURI))) {
-                final RemoteIpFilter.XForwardedRequest forwardedRequest = new RemoteIpFilter.XForwardedRequest(request);
-
-                if (!StringUtils.hasText(IpUtil.getIpAddress())) {
-                    chain.doFilter(req, res);
-                    return;
-                }
-
-                chain.doFilter(forwardedRequest, res);
+                chain.doFilter(req, res);
 
             } else {
                 chain.doFilter(req, res);
