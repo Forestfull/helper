@@ -138,33 +138,31 @@ function typingHTML(option) {
 typingHTML({
     className: 'waiting-header',
     html: bannerTitle,
+    interval: 20
+});
+typingHTML({
+    className: 'waiting-explain',
+    html: welcomeHtml,
     interval: 20,
     callback: () => {
-        typingHTML({
-            className: 'waiting-explain',
-            html: welcomeHtml,
-            interval: 20,
-            callback: () => {
-                setTimeout(() => {
-                    const waitDotAddr = setInterval(() => {
-                        const waitDot = document.getElementById('first-loading-char');
-                        const dotLength = waitDot.innerText.split('.').length;
-                        if (dotLength > 3) {
-                            waitDot.innerText = '.';
-                        } else {
-                            waitDot.innerText += '.';
-                        }
-                    }, 200);
+        setTimeout(() => {
+            const waitDotAddr = setInterval(() => {
+                const waitDot = document.getElementById('first-loading-char');
+                const dotLength = waitDot.innerText.split('.').length;
+                if (dotLength > 3) {
+                    waitDot.innerText = '.';
+                } else {
+                    waitDot.innerText += '.';
+                }
+            }, 200);
 
-                    fetch('/support/' + location.pathname)
-                        .then(option => {
-                            //기다려
-                        })
-                        .catch(reason => {
-                            clearInterval(waitDotAddr);
-                        });
-                }, welcomeHtml.length * 2)
-            }
-        });
+            fetch('/support?token=' + location.pathname)
+                .then(option => {
+                    //기다려
+                })
+                .catch(reason => {
+                    clearInterval(waitDotAddr);
+                });
+        }, welcomeHtml.length * 2)
     }
 });
