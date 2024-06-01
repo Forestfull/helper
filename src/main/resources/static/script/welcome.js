@@ -156,7 +156,7 @@ typingHTML({
                         }
                     }, 200);
 
-                    fetch('http://dev.forestfull.com:8282/suport/' + location.pathname)
+                    fetch('/support/' + location.pathname)
                         .then(option => {
                             //기다려
                         })
