@@ -6,12 +6,14 @@ import com.forestfull.helper.entity.NetworkVO;
 import com.forestfull.helper.handler.JsonTypeHandler;
 import com.forestfull.helper.service.ClientService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
 
-@RestController
+@Controller
 @RequiredArgsConstructor
 public class ClientController {
 
@@ -22,6 +24,13 @@ public class ClientController {
         public static final String SUPPORT_HISTORY = "/support/history";
     }
 
+    @GetMapping("/{token}")
+    String indexPage(Model model, @PathVariable("token") String token) {
+        model.addAttribute("token", token);
+        return "index.html";
+    }
+
+    @ResponseBody
     @GetMapping(URI.SUPPORT_HISTORY)
     NetworkVO.Response<List<Client.History>> getHistoriesByClientToken(
             @RequestParam(name = "token") String token
@@ -29,6 +38,7 @@ public class ClientController {
         return NetworkVO.Response.ok(NetworkVO.DATA_TYPE.JSON, clientService.getHistoriesByClientToken(token, exceptedIds));
     }
 
+    @ResponseBody
     @PostMapping(URI.SUPPORT)
     NetworkVO.Response<String> toRequestForSolution(
             @RequestBody Json requestData

@@ -1,0 +1,19 @@
+@charset "UTF-8";
+
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: black;
+    color: white;
+}
+
+@font-face {
+    font-family: 'neodgm';
+    src: url("/font/NeoDunggeunmoPro-Regular.woff2") format('truetype');
+
+}
+
+* {
+    font-family: 'neodgm', 'monospace' !important;
+    box-sizing: border-box;
+}
