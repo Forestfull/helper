@@ -51,6 +51,11 @@ public class CommmonFilter implements Filter {
                         return;
                     }
 
+                    if (!clientByToken.get().isValidated(token)) {
+                        chain.doFilter(req, res);
+                        return;
+                    }
+
                     forwardedRequest.setHeader("client", JsonTypeHandler.writer.writeValueAsString(clientByToken.get()));
 
                     final Map<String, List<String>> header = new LinkedHashMap<>();

@@ -6,8 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Optional;
 
 @Data
 public class Client {
@@ -15,6 +19,11 @@ public class Client {
     private String code;
     private String token;
     private String description;
+
+    public boolean isValidated(String token) {
+        final String decodedToken = Arrays.toString(Base64.getDecoder().decode(token));
+        return Optional.ofNullable(token).orElse("").equals(decodedToken);
+    }
 
     @Data
     @Builder
