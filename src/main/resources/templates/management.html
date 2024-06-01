@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Forest Full</title>
+    <script defer src="/util/script.js"></script>
+    <link rel="stylesheet" href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css">
+    <script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+</head>
+<body>
+<header style="display: flex; flex-direction: row; justify-content: space-between;">
+    <ul th:each="serviceCode : ${serviceCodes}" class="dropdown-menu">
+        <li class="dropdown-header">Service Code</li>
+        <li><a type="button" class="dropdown-item" href="#" th:text="${serviceCode}"></a></li>
+    </ul>
+    <form action="/logout">
+        <button type="submit" class="btn btn-outline-danger">Log Out</button>
+    </form>
+</header>
+</body>
+</html>
