@@ -1,5 +1,6 @@
 package com.forestfull.helper.handler;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
@@ -27,6 +28,14 @@ public class JsonTypeHandler extends BaseTypeHandler<Json> {
     public static ObjectMapper mapper = new ObjectMapper();
     public static ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
     public static ObjectReader reader = mapper.reader();
+
+    public static <T> T read(Object var1, Class<T> var2) {
+        try {
+            return reader.readValue(String.valueOf(var1), var2);
+        } catch (IOException e) {
+            return null;
+        }
+    }
 
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, Json parameter, JdbcType jdbcType) throws SQLException {

@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Objects;
 import java.util.Optional;
 
 @Data
@@ -17,9 +18,12 @@ public class Client {
     private Long id;
     private String code;
     private String token;
+    private String encodedToken;
     private String description;
 
     public String getEncodedToken() {
+        if (Objects.nonNull(encodedToken)) return encodedToken;
+
         final byte[] bytes = this.token.getBytes();
         return Optional.of(new String(Base64.getEncoder().encode(bytes))).orElse("");
     }

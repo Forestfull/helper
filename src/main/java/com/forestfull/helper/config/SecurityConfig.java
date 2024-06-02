@@ -2,6 +2,8 @@ package com.forestfull.helper.config;
 
 import com.forestfull.helper.controller.ClientController;
 import com.forestfull.helper.controller.ManagementController;
+import com.forestfull.helper.domain.Client;
+import com.forestfull.helper.handler.JsonTypeHandler;
 import com.forestfull.helper.service.CommmonFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -79,8 +81,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(reg -> reg.requestMatchers(HttpMethod.GET, ignoringPattern).permitAll())
                 .authorizeHttpRequests(reg -> reg.requestMatchers(clientUriPatterns)
                         .access((auth, ctx) -> {
-                            final Optional<String> client = Optional.ofNullable(ctx.getRequest().getHeader("client"));
-                            return new AuthorizationDecision(client.isPresent());
+                            final Client client = JsonTypeHandler.read(ctx.getRequest().getHeader("client"), Client.class);
+                            return new AuthorizationDecision(Objects.nonNull(client));
                         }))
                 .authorizeHttpRequests(reg -> reg.requestMatchers(managementUriPatterns).authenticated())
                 .httpBasic(Customizer.withDefaults())
