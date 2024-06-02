@@ -1,0 +1,18 @@
+@charset "UTF-8";
+
+.client-request {
+    display: flex;
+    width: 100%;
+    margin-top: 20px;
+    position: absolute;
+    bottom: 0;
+}
+
+.client-request > textarea {
+    display: block;
+    width: 100%;
+    min-height: 10vh;
+    resize: none;
+    background: black;
+    color: white;
+}

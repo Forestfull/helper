@@ -3,17 +3,18 @@
 html, body {
     margin: 0 !important;
     padding: 0 !important;
-    background: black;
-    color: white;
+    background: black !important;
+    color: white !important;
+    overflow: hidden !important;
 }
 
 @font-face {
     font-family: 'neodgm';
     src: url("/font/NeoDunggeunmoPro-Regular.woff2") format('truetype');
-
 }
 
 * {
     font-family: 'neodgm', 'monospace' !important;
     box-sizing: border-box;
 }
+

@@ -45,7 +45,7 @@ public class SecurityConfig {
 
     private final CommmonFilter commmonFilter;
 
-    public static final String[] ignoringPattern = {"/aXQgaXMgZ3**==", "/favicon.**", "/script/**", "/style/**", "/font/**"};
+    public static final String[] ignoringPattern = {"/aXQgaXMgZ3**==", "/favicon.**", "/webjars/**", "/script/**", "/style/**", "/font/**"};
     public static final String[] clientUriPatterns = Arrays.stream(ClientController.URI.class.getFields())
             .map(field -> {
                 try {
