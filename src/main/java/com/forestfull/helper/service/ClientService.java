@@ -19,7 +19,7 @@ public class ClientService {
 
     public Optional<Client> getClientByToken(String token) {
         final Map<String, Client> tokenMap = ScheduleManager.tokenMap;
-        final Client client = tokenMap.get(token);
+        final Client client = tokenMap.get(token).clone();
         if (!ObjectUtils.isEmpty(client)) return Optional.of(client);
 
         return clientMapper.getClientByToken(token);
@@ -31,8 +31,12 @@ public class ClientService {
         if (ObjectUtils.isEmpty(historiesByClientToken)) return Collections.emptyList();
 
         return historiesByClientToken.stream()
-                .peek(history -> getClientByToken(token).ifPresent(history::setClient))
-                .sorted(Comparator.comparing(Client.History::getCreatedTime).reversed())
+                .peek(ch -> getClientByToken(token)
+                        .ifPresent(c -> {
+                            c.setToken(null);
+                            ch.setClient(c);
+                        }))
+                .sorted(Comparator.comparing(Client.History::getCreatedTime))
                 .toList();
     }
 

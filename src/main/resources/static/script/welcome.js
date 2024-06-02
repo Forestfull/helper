@@ -161,8 +161,10 @@ typingHTML({
                 .then(body => {
                     clearInterval(waitDotAddr);
                     document.getElementById('first-loading-char').innerText = '[Success]';
-                    console.log(body);
-                    // document.querySelector('.client-history').innerText = JSON.stringify(response.json());
+
+
+                    document.querySelector('.client-history').innerText = JSON.stringify(body, null, 2);
+                    document.querySelector('.client-history').scrollTop = document.querySelector('.client-history').scrollHeight;
                 })
                 .catch(reason => {
                     clearInterval(waitDotAddr);

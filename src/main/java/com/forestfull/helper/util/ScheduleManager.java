@@ -25,7 +25,7 @@ public class ScheduleManager {
         final List<Client> usedAllClient = clientMapper.getUsedAllClient();
         if (ObjectUtils.isEmpty(usedAllClient)) return;
 
-        tokenMap = usedAllClient.stream().collect(Collectors.toMap(Client::getEncodedToken, client -> client));
+        tokenMap = usedAllClient.stream().collect(Collectors.toMap(Client::encodeToken, client -> client));
     }
 
 

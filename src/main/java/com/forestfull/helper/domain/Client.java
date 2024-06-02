@@ -1,35 +1,39 @@
 package com.forestfull.helper.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.forestfull.helper.entity.Json;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Objects;
 import java.util.Optional;
 
 @Data
-public class Client {
+public class Client implements Cloneable {
     private Long id;
     private String code;
     private String token;
-    private String encodedToken;
     private String description;
 
-    public String getEncodedToken() {
-        if (Objects.nonNull(encodedToken)) return encodedToken;
-
+    public String encodeToken() {
         final byte[] bytes = this.token.getBytes();
         return Optional.of(new String(Base64.getEncoder().encode(bytes))).orElse("");
     }
 
     public boolean isValidated(String token) {
-        return this.getEncodedToken().equals(token);
+        return this.encodeToken().equals(token);
+    }
+
+    @Override
+    public Client clone() {
+        try {
+            return (Client) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 
     @Data

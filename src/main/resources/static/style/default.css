@@ -16,5 +16,6 @@ html, body {
 * {
     font-family: 'neodgm', 'monospace' !important;
     box-sizing: border-box;
+    scrollbar-width: thin;
 }
 

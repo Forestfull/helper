@@ -16,3 +16,10 @@
     background: black;
     color: white;
 }
+
+.client-history {
+    max-height: 60vh;
+    overflow: auto;
+    margin: 10px 5px;
+    scroll-behavior: smooth;
+}
