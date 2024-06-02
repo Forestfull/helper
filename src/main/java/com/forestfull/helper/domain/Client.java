@@ -42,7 +42,7 @@ public class Client {
         private Client client;
         private String type;
         private String ipAddress;
-        private Json data;
+        private String data;
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         private LocalDateTime createdTime;
     }

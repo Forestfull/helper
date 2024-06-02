@@ -26,7 +26,8 @@ public class ClientService {
     }
 
     public List<Client.History> getHistoriesByClientToken(String token, List<Long> exceptedIds) {
-        final List<Client.History> historiesByClientToken = clientMapper.getHistoriesByClientToken(token, exceptedIds);
+        final String decodedToken = new String(Base64.getDecoder().decode(token));
+        final List<Client.History> historiesByClientToken = clientMapper.getHistoriesByClientToken(decodedToken, exceptedIds);
         if (ObjectUtils.isEmpty(historiesByClientToken)) return Collections.emptyList();
 
         return historiesByClientToken.stream()
@@ -35,7 +36,7 @@ public class ClientService {
                 .toList();
     }
 
-    public void toRequestForSolution(Long clientId, Json requestData) {
+    public void toRequestForSolution(Long clientId, String requestData) {
         clientMapper.toRequestForSolution(clientId, IpUtil.getIpAddress(), requestData);
     }
 }

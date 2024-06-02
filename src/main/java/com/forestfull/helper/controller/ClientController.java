@@ -41,7 +41,7 @@ public class ClientController {
     @ResponseBody
     @PostMapping(URI.SUPPORT)
     NetworkVO.Response<String> toRequestForSolution(
-            @RequestBody Json requestData
+            @RequestBody String requestData
             , @RequestHeader String client
     ) throws IOException {
         clientService.toRequestForSolution(JsonTypeHandler.reader.readValue(client, Client.class).getId(), requestData);

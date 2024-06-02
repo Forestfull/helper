@@ -17,7 +17,7 @@ public interface ClientMapper {
     List<Client.History> getHistoriesByClientToken(@Param("token") String token, @Param("exceptedIds") List<Long> exceptedIds);
 
     @Insert("INSERT INTO client_history(client_id, ip_address, data) VALUES (#{clientId}, #{ipAddress}, #{requestData})")
-    void toRequestForSolution(@Param("clientId") Long clientId, @Param("ipAddress") String ipAddress, @Param("requestData") Json requestData);
+    void toRequestForSolution(@Param("clientId") Long clientId, @Param("ipAddress") String ipAddress, @Param("requestData") String requestData);
 
     @Select("SELECT c.id, c.code, c.description FROM client c WHERE c.token = #{token}")
     Optional<Client> getClientByToken(@Param("token") String token);

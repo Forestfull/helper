@@ -172,8 +172,10 @@ document.getElementById('requestAfterService').addEventListener('click', e => {
     fetch('/support', {
         method: 'POST',
         headers: {
+            'Content-Type': 'application/json',
             'token': location.pathname.substring(1, location.pathname.length)
-        }
+        },
+        body: JSON.stringify(document.querySelector('.client-request > textarea').value)
     })
         .then(response => {
             //기다려
