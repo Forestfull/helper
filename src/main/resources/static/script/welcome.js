@@ -162,8 +162,12 @@ typingHTML({
                     clearInterval(waitDotAddr);
                     document.getElementById('first-loading-char').innerText = '[Success]';
 
+                    document.querySelector('.client-history').innerText = body.map(chat => {
+                        const className = chat?.type === 'response' ? 'chat order-chat' : 'chat my-chat';
 
-                    document.querySelector('.client-history').innerText = JSON.stringify(body, null, 2);
+                        return className  + chat?.data;
+                    });
+                    // document.querySelector('.client-history').innerText = JSON.stringify(body, null, 2);
                     document.querySelector('.client-history').scrollTop = document.querySelector('.client-history').scrollHeight;
                 })
                 .catch(reason => {
