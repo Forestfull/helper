@@ -157,8 +157,12 @@ typingHTML({
             }, 200);
 
             fetch('/support/history?token=' + location.pathname.substring(1, location.pathname.length), {})
-                .then(response => {
-                    console.log(response);
+                .then(response => response.json())
+                .then(body => {
+                    clearInterval(waitDotAddr);
+                    document.getElementById('first-loading-char').innerText = '[Success]';
+                    console.log(body);
+                    // document.querySelector('.client-history').innerText = JSON.stringify(response.json());
                 })
                 .catch(reason => {
                     clearInterval(waitDotAddr);
