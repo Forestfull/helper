@@ -156,13 +156,13 @@ typingHTML({
                 }
             }, 200);
 
-            fetch('/support?token=' + location.pathname)
-                .then(option => {
-                    //기다려
+            fetch('/support/history?token=' + location.pathname, {})
+                .then(response => {
+                    console.log(response);
                 })
                 .catch(reason => {
                     clearInterval(waitDotAddr);
                 });
-        }, welcomeHtml.length * 2)
+        }, welcomeHtml.length * 2);
     }
 });
