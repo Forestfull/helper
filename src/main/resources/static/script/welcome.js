@@ -1,4 +1,4 @@
-const bannerTitle = '<h1 style="text-align: center"> BASE64: ' + location.pathname + '</h1>';
+const bannerTitle = '<h1 style="text-align: center"> ' + location.pathname + '</h1>';
 welcomeHtml = '<h3 id="welcome-description" style="width: 50vw; margin: 10px auto; font-size: 1rem;">' +
     '<p>Waiting for permission from server.</p>' +
     '<p>Please wait a moment</p>' +
