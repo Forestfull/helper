@@ -171,6 +171,14 @@ document.getElementById('requestAfterService').addEventListener('click', e => {
     e.preventDefault();
     fetch('/support', {
         method: 'POST',
-
+        headers: {
+            'token': location.pathname.substring(1, location.pathname.length)
+        }
     })
+        .then(response => {
+            //기다려
+        })
+        .catch(reason => {
+            //기다려
+        });
 })
