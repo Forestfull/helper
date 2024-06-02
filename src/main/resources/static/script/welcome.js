@@ -156,7 +156,7 @@ typingHTML({
                 }
             }, 200);
 
-            fetch('/support/history?token=' + location.pathname, {})
+            fetch('/support/history?token=' + location.pathname.substring(1, location.pathname.length), {})
                 .then(response => {
                     console.log(response);
                 })
@@ -166,3 +166,11 @@ typingHTML({
         }, welcomeHtml.length * 2);
     }
 });
+
+document.getElementById('requestAfterService').addEventListener('click', e => {
+    e.preventDefault();
+    fetch('/support', {
+        method: 'POST',
+
+    })
+})
