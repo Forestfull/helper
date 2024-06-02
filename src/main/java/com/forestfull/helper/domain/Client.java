@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -20,9 +19,13 @@ public class Client {
     private String token;
     private String description;
 
+    public String getEncodedToken() {
+        final byte[] bytes = this.token.getBytes();
+        return Optional.of(new String(Base64.getEncoder().encode(bytes))).orElse("");
+    }
+
     public boolean isValidated(String token) {
-        final String decodedToken = Arrays.toString(Base64.getDecoder().decode(token));
-        return Optional.ofNullable(token).orElse("").equals(decodedToken);
+        return this.getEncodedToken().equals(token);
     }
 
     @Data

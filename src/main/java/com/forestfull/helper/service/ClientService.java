@@ -9,10 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +18,8 @@ public class ClientService {
     private final ClientMapper clientMapper;
 
     public Optional<Client> getClientByToken(String token) {
-        final Client client = ScheduleManager.tokenMap.get(token);
+        final Map<String, Client> tokenMap = ScheduleManager.tokenMap;
+        final Client client = tokenMap.get(token);
         if (!ObjectUtils.isEmpty(client)) return Optional.of(client);
 
         return clientMapper.getClientByToken(token);

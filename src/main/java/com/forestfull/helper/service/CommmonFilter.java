@@ -41,7 +41,7 @@ public class CommmonFilter implements Filter {
                     .anyMatch(uri -> SecurityConfig.antPathMatcher.match(uri, requestURI))) {
                 final RemoteIpFilter.XForwardedRequest forwardedRequest = new RemoteIpFilter.XForwardedRequest(request);
                 final String token = HttpMethod.GET.name().equalsIgnoreCase(request.getMethod())
-                        ? String.valueOf(request.getParameter("token"))
+                        ? String.valueOf(request.getParameter("token")).substring(1, request.getParameter("token").length())
                         : request.getHeader("token");
                 final Optional<Client> clientByToken = clientService.getClientByToken(token);
 
