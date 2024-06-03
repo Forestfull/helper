@@ -140,27 +140,36 @@ typingHTML({
     html: bannerTitle,
     interval: 20
 });
+
+function loading() {
+    const waitDot = document.getElementById('first-loading-char');
+    waitDot.innerText = '';
+    return setInterval(() => {
+        const dotLength = waitDot.innerText.split('.').length;
+        if (dotLength > 3) {
+            waitDot.innerText = '.';
+        } else {
+            waitDot.innerText += '.';
+        }
+    }, 200);
+}
+
+function complete(waitDotAddr) {
+    clearInterval(waitDotAddr);
+    document.getElementById('first-loading-char').innerText = '[Success]';
+}
+
 typingHTML({
     className: 'waiting-explain',
     html: welcomeHtml,
     interval: 20,
     callback: () => {
         setTimeout(() => {
-            const waitDotAddr = setInterval(() => {
-                const waitDot = document.getElementById('first-loading-char');
-                const dotLength = waitDot.innerText.split('.').length;
-                if (dotLength > 3) {
-                    waitDot.innerText = '.';
-                } else {
-                    waitDot.innerText += '.';
-                }
-            }, 200);
-
+            const waitDotAddr = loading();
             fetch('/support/history?token=' + location.pathname.substring(1, location.pathname.length), {})
                 .then(response => response.json())
                 .then(body => {
-                    clearInterval(waitDotAddr);
-                    document.getElementById('first-loading-char').innerText = '[Success]';
+                    complete(waitDotAddr);
 
                     for (let chat of body) {
                         const className = chat?.type === 'response' ? 'other-chat' : 'my-chat';
@@ -186,6 +195,9 @@ typingHTML({
 
 document.getElementById('requestAfterService').addEventListener('click', e => {
     e.preventDefault();
+    let addr = loading();
+
+
     fetch('/support', {
         method: 'POST',
         headers: {
@@ -195,7 +207,7 @@ document.getElementById('requestAfterService').addEventListener('click', e => {
         body: document.querySelector('.client-request > textarea').value
     })
         .then(response => {
-            //기다려
+            complete(addr);
         })
         .catch(reason => {
             //기다려
