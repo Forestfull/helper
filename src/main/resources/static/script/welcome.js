@@ -5,6 +5,8 @@ welcomeHtml = '<h3 id="welcome-description" style="width: 50vw; margin: 10px aut
     '<p id="first-loading-char"></p>' +
     '</h3>';
 
+let clientHistory;
+
 function typingHTML(option) {
     const className = option.className;
     const html = option.html;
@@ -143,7 +145,7 @@ typingHTML({
 
 function loading() {
     const waitDot = document.getElementById('first-loading-char');
-    waitDot.innerText = '';
+    waitDot.innerHTML = '&nbsp;';
     return setInterval(() => {
         const dotLength = waitDot.innerText.split('.').length;
         if (dotLength > 3) {
@@ -170,8 +172,8 @@ typingHTML({
                 .then(response => response.json())
                 .then(body => {
                     complete(waitDotAddr);
-
-                    for (let chat of body) {
+                    clientHistory = body
+                    for (let chat of clientHistory) {
                         const className = chat?.type === 'response' ? 'other-chat' : 'my-chat';
 
                         let author = chat?.type === 'response' ? 'Answer' : chat?.client?.code;
@@ -197,7 +199,6 @@ document.getElementById('requestAfterService').addEventListener('click', e => {
     e.preventDefault();
     let addr = loading();
 
-
     fetch('/support', {
         method: 'POST',
         headers: {
@@ -208,8 +209,30 @@ document.getElementById('requestAfterService').addEventListener('click', e => {
     })
         .then(response => {
             complete(addr);
+            document.querySelector('.client-request > textarea').value = '';
+            fetch('/support/history?token=' + location.pathname.substring(1, location.pathname.length) + '&exceptedIds=' + clientHistory.map(ch => ch.id))
+                .then(response => response.json())
+                .then(body => {
+                    clientHistory.push(body);
+                    for (let chat of body) {
+                        const className = chat?.type === 'response' ? 'other-chat' : 'my-chat';
+
+                        let author = chat?.type === 'response' ? 'Answer' : chat?.client?.code;
+                        document.querySelector('.client-history').innerHTML
+                            += '<section class="' + className + '">' +
+                            '<article class="author">' + author + '</article>' +
+                            '<article class="ip">' + chat?.ipAddress + '</article>' +
+                            '<article class="time">' + chat?.createdTime + '</article>' +
+                            '<article class="chat">' + chat?.data + '</article>' +
+                            '</section>'
+                    }
+                    document.querySelector('.client-history').scrollTop = document.querySelector('.client-history').scrollHeight;
+                    alert('completed your request.');
+                });
         })
         .catch(reason => {
+            alert('error has occurred. please try again');
+
             //기다려
         });
 })
