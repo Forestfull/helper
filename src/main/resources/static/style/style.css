@@ -25,16 +25,22 @@
 }
 
 .chat {
-    max-width: 60vw;
-    border-radius: 20px;
     padding: 10px;
     word-break: break-word;
+    border: 1px double gray;
+    border-radius: 10px;
+    display: inline-block;
+    max-width: 60vw;
+}
+
+.my-chat, .other-chat {
+    margin: 10px 0;
 }
 
 .my-chat {
-    
+    text-align: right;
 }
 
 .other-chat {
-
+    text-align: left;
 }

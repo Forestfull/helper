@@ -162,12 +162,19 @@ typingHTML({
                     clearInterval(waitDotAddr);
                     document.getElementById('first-loading-char').innerText = '[Success]';
 
-                    document.querySelector('.client-history').innerText = body.map(chat => {
-                        const className = chat?.type === 'response' ? 'chat order-chat' : 'chat my-chat';
+                    for (let chat of body) {
+                        const className = chat?.type === 'response' ? 'other-chat' : 'my-chat';
 
-                        return className  + chat?.data;
-                    });
-                    // document.querySelector('.client-history').innerText = JSON.stringify(body, null, 2);
+                        let author = chat?.type === 'response' ? 'Answer' : chat?.client?.code;
+                        document.querySelector('.client-history').innerHTML
+                            += '<section class="' + className + '">' +
+                            '<article class="author">' + author + '</article>' +
+                            '<article class="ip">' + chat?.ipAddress + '</article>' +
+                            '<article class="time">' + chat?.createdTime + '</article>' +
+                            '<article class="chat">' + chat?.data + '</article>' +
+                            '</section>'
+                    }
+
                     document.querySelector('.client-history').scrollTop = document.querySelector('.client-history').scrollHeight;
                 })
                 .catch(reason => {
@@ -185,7 +192,7 @@ document.getElementById('requestAfterService').addEventListener('click', e => {
             'Content-Type': 'application/json',
             'token': location.pathname.substring(1, location.pathname.length)
         },
-        body: JSON.stringify(document.querySelector('.client-request > textarea').value)
+        body: document.querySelector('.client-request > textarea').value
     })
         .then(response => {
             //기다려

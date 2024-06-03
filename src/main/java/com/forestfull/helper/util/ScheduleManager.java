@@ -27,7 +27,4 @@ public class ScheduleManager {
 
         tokenMap = usedAllClient.stream().collect(Collectors.toMap(Client::encodeToken, client -> client));
     }
-
-
-
 }
