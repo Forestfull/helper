@@ -20,7 +20,7 @@ public class ScheduleManager {
     public static volatile Map<String, Client> tokenMap = new HashMap<>();
     private final ClientMapper clientMapper;
 
-    @Scheduled(fixedRate = 1, timeUnit = TimeUnit.MINUTES)
+    @Scheduled(fixedRate = 10, timeUnit = TimeUnit.MINUTES)
     void recyclingTokenSet() {
         final List<Client> usedAllClient = clientMapper.getUsedAllClient();
         if (ObjectUtils.isEmpty(usedAllClient)) return;

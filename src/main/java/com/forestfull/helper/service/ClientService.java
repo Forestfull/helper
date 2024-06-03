@@ -18,11 +18,7 @@ public class ClientService {
     private final ClientMapper clientMapper;
 
     public Optional<Client> getClientByToken(String token) {
-        final Map<String, Client> tokenMap = ScheduleManager.tokenMap;
-        final Client client = tokenMap.get(token).clone();
-        if (!ObjectUtils.isEmpty(client)) return Optional.of(client);
-
-        return clientMapper.getClientByToken(token);
+        return Optional.of(ScheduleManager.tokenMap.get(token).clone());
     }
 
     public List<Client.History> getHistoriesByClientToken(String token, List<Long> exceptedIds) {
