@@ -5,7 +5,11 @@ import com.forestfull.helper.entity.Json;
 import com.forestfull.helper.mapper.ClientMapper;
 import com.forestfull.helper.util.IpUtil;
 import com.forestfull.helper.util.ScheduleManager;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -16,6 +20,7 @@ import java.util.*;
 public class ClientService {
 
     private final ClientMapper clientMapper;
+    private final JavaMailSender mailSender;
 
     public Optional<Client> getClientByToken(String token) {
         return Optional.of(ScheduleManager.tokenMap.get(token).clone());
@@ -36,7 +41,20 @@ public class ClientService {
                 .toList();
     }
 
-    public void toRequestForSolution(Long clientId, String requestData) {
-        clientMapper.toRequestForSolution(clientId, IpUtil.getIpAddress(), requestData);
+    public boolean toRequestForSolution(Client client, String requestData) {
+        final MimeMessage mimeMessage = mailSender.createMimeMessage();
+        final MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+        try {
+            helper.setSubject("[" + client.getCode() + "]accepted request");
+            helper.setText(requestData);
+            helper.setTo("bigfoot7774@gmail.com");
+            mailSender.send(mimeMessage);
+
+            clientMapper.toRequestForSolution(client.getId(), IpUtil.getIpAddress(), requestData);
+            return true;
+        } catch (MessagingException e) {
+            return false;
+        }
+
     }
 }

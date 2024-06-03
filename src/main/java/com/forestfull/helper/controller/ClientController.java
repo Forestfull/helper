@@ -6,6 +6,7 @@ import com.forestfull.helper.entity.NetworkVO;
 import com.forestfull.helper.handler.JsonTypeHandler;
 import com.forestfull.helper.service.ClientService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -48,7 +49,9 @@ public class ClientController {
             @RequestBody String requestData
             , @RequestHeader String client
     ) throws IOException {
-        clientService.toRequestForSolution(JsonTypeHandler.reader.readValue(client, Client.class).getId(), requestData);
-        return NetworkVO.Response.ok(NetworkVO.DATA_TYPE.STRING, "Success");
+        final boolean isSucceed = clientService.toRequestForSolution(JsonTypeHandler.reader.readValue(client, Client.class), requestData);
+        return isSucceed
+                ? NetworkVO.Response.ok(NetworkVO.DATA_TYPE.STRING, "Success")
+                : NetworkVO.Response.fail(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
