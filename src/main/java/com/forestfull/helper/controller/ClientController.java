@@ -25,9 +25,13 @@ public class ClientController {
     }
 
     @GetMapping("/{token}")
-    String indexPage(Model model, @PathVariable("token") String token) {
-        model.addAttribute("token", token);
+    String indexPage(@PathVariable("token") String token) {
         return "index.html";
+    }
+
+    @GetMapping("/master")
+    String managementPage() {
+        return "management.html";
     }
 
     @ResponseBody
